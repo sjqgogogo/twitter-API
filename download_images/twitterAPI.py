@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# ffmpeg命令: ffmpeg -f image2 -i d:/downloadIMAGES/%d.jpg -vcodec libx264 -r 25 -b 2000k test.mp4
 """
 Created on Wed Sep 26 10:19:23 2018
 
@@ -8,6 +9,7 @@ import tweepy
 from tweepy import OAuthHandler
 import json
 import wget 
+import os
 consumer_key = 'X8C7TcTQ02ko5aO7H57wlFQB5'
 consumer_secret = 'VxDFXs7o4vJunY8tGSSjSRNsETrVQCj9dpLR89FDFRG2ciFnw7'
 access_token = '1034472972273299456-P0HZdo1AqNaUKMM9CBbZsuzXI1cCGQ'
@@ -73,20 +75,21 @@ for status in tweets:
 
 
 
+filenum=[]
+for i in range(num):
+    filenum.append(str(i))
 
-#for i in range(num):
-#    filenum=str(i)
-#    print(filenum)
-#      
+      
         
         
         
-        
+path = os.getcwd()
+print(path)        
 i=1        
 for media_file in media_files:
     if(i<num):
         i=i+1
-        wget.download(url=media_file)
+        wget.download(url=media_file,out="D:\downloadIMAGES\\"+filenum[i-1]+".jpg")
     else:
         break;
             
