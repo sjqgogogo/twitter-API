@@ -14,7 +14,7 @@ consumer_key = 'X8C7TcTQ02ko5aO7H57wlFQB5'
 consumer_secret = 'VxDFXs7o4vJunY8tGSSjSRNsETrVQCj9dpLR89FDFRG2ciFnw7'
 access_token = '1034472972273299456-P0HZdo1AqNaUKMM9CBbZsuzXI1cCGQ'
 access_secret = 'TJOA8hBis0rsuWxzvmIVPX3ra2nfyuMjuWXz4rEDvKyKj'
-target =  'nba'
+target =  'HoustonRockets'
 num = 100
 num = num+1
 @classmethod
