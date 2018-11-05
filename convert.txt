@@ -1,0 +1,1 @@
+ffmpeg -r 1/5 -f image2 -s 600x600 -i d:/downloadIMAGES/%d.jpg  -crf 25  -pix_fmt yuv420p -vf scale=1280:-2 name.mp4
