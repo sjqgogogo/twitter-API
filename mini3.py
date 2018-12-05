@@ -16,7 +16,10 @@ from google.cloud import vision
 from google.cloud.vision import types
 from google.oauth2 import service_account
 import pymysql.cursors
+import pymongo
+import shutil
 from datetime import datetime
+
 consumer_key = 'X8C7TcTQ02ko5aO7H57wlFQB5'
 consumer_secret = 'VxDFXs7o4vJunY8tGSSjSRNsETrVQCj9dpLR89FDFRG2ciFnw7'
 access_token = '1034472972273299456-P0HZdo1AqNaUKMM9CBbZsuzXI1cCGQ'
@@ -33,6 +36,15 @@ mysql_connection = pymysql.connect(host='127.0.0.1',
                             db='sql_mini3',
                             charset='utf8mb4',
                             cursorclass=pymysql.cursors.DictCursor)
+
+
+
+#enter mongo config
+myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+mongo_db = myclient["mongo_mini3"]
+mongo_col = mongo_db['twitter']
+
+
 
 
 num = num+1
@@ -98,25 +110,31 @@ filenum=[]
 for i in range(num):
     filenum.append(str(i))
 
-      
-        
-        
-        
+
+
+
+
 path = os.getcwd()
-print(path)        
-i=1        
+if os.path.isdir("D:\\downloadIMAGES"):
+	shutil.rmtree("D:\\downloadIMAGES")
+os.mkdir('D:\\downloadIMAGES')
+
+i=1
 for media_file in media_files:
-    if(i<num):
-        i=i+1
-        wget.download(url=media_file,out="D:\\downloadIMAGES\\"+filenum[i-1]+".jpg")
-    else:
-        break;
-            
+	if(i<num):
+		i=i+1
+		wget.download(url=media_file,out="D:\\downloadIMAGES\\"+filenum[i-1]+".jpg")
+	else:
+		break;
+
+
+
+
 
 # convert pictures to a video
-ffmpegstr = 'ffmpeg -y -f image2 -i  d:/downloadIMAGES/%d.jpg -vcodec libx264 -r 25 -b 2000k ' + target +'.mp4'
+ffmpegstr = 'ffmpeg -y -f image2 -i d:/downloadIMAGES/%d.jpg -vcodec libx264 -r 25 -b 2000k ' + target +'.mp4'
+print(ffmpegstr)
 os.system(ffmpegstr)
-
 
 
 
@@ -124,12 +142,12 @@ client = vision.ImageAnnotatorClient()
 
 
 
-    # Explicitly use service account credentials by specifying the private key
-    # file.
+# Explicitly use service account credentials by specifying the private key
+# file.
 storage_client = storage.Client.from_service_account_json(
-        'D:/googleAPI/google_vision.json')              #input the location of your json file
+       'D:/googleAPI/google_vision.json')              #input the location of your json file
 
-    # Make an authenticated API request
+# Make an authenticated API request
 buckets = list(storage_client.list_buckets())
 
 
@@ -162,12 +180,13 @@ for i in range(1,num):
             
         if same==0:
             current_labels.append(a.description)
+            #write to mysql db
             try:
                 with mysql_connection.cursor() as cursor:
-	        # Create a new record
-	        #sql = "INSERT INTO `sql_mini3` (`twitter_id`, `label`,`time`) VALUES (%s, %s,%s)"
+                	# Create a new record
+                	#sql = "INSERT INTO `sql_mini3` (`twitter_id`, `label`,`time`) VALUES (%s, %s,%s)"
                     sql = 'INSERT INTO sql_mini3(twitter_id, label, time) VALUES (%s,%s,%s)'
-                    cursor.execute(sql, ( target, a.description, datetime.now() ) )
+                    cursor.execute(sql, (target, a.description, datetime.now()))
 
 	    # connection is not autocommit by default. So you must commit to save
 	    # your changes.
@@ -175,6 +194,18 @@ for i in range(1,num):
 
             finally:
                 sql = 1
+
+
+
+
+            #write to mongo db
+            mongo_dict = {"twitter_id":target,"label":a.description,'time':datetime.now()}
+            mongo_col.insert_one(mongo_dict)
+            print('insert:',mongo_dict)
+
+
+
+
 
 b=1
 
